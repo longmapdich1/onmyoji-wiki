@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "256778662315",
+    "project_id": "onmyoji-wiki",
+    "storage_bucket": "onmyoji-wiki.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256778662315:android:96bb907c99c26065aae2ee",
+        "android_client_info": {
+          "package_name": "com.example.onmyoji_wiki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "256778662315-8kg5r4dgq44obp0q4j2qg05m8ca59bgs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjjsHoNCly2JQXgK5_Rbim0JXjybi4zqM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "256778662315-8kg5r4dgq44obp0q4j2qg05m8ca59bgs.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "256778662315-tbcrp73f17ordik5gufm7ps79s0uiti9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.onmyojiWiki"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
