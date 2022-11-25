@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:onmyoji_wiki/common/theme/custom_colors.dart';
 
 ///Config ThemeData For DarkMode
-ThemeData _getThemeDataDark(BuildContext context) {
-  final baseTheme = ThemeData.dark();
-  return baseTheme.copyWith();
+ThemeData getTheme(BuildContext context) {
+  final baseTheme = ThemeData.light();
+  return baseTheme.copyWith(
+    backgroundColor: Colors.white,
+    appBarTheme: const AppBarTheme(
+      color: Colors.white,
+      elevation: 0,
+      iconTheme: IconThemeData(color: Colors.black),
+    ),
+    scaffoldBackgroundColor: Colors.white,
+  );
 }
 
 class DynamicTheme extends InheritedWidget {
@@ -17,7 +25,7 @@ class DynamicTheme extends InheritedWidget {
     Key? key,
     Widget? child,
   }) : super(key: key, child: child!) {
-    themeData = _getThemeDataDark(context);
+    themeData = getTheme(context);
     customColor = CustomColor();
   }
 

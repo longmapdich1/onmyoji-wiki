@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/theme/custom_theme.dart';
 import 'package:onmyoji_wiki/ui/home_page.dart';
@@ -25,6 +23,7 @@ class WikiApp extends StatelessWidget {
             }
           },
           child: MaterialApp(
+            theme: getTheme(context),
             navigatorKey:navigatorKey ,
             title: "Onmyoji Wiki",
             debugShowCheckedModeBanner: false,
