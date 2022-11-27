@@ -28,5 +28,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-assets:
-  - assets/
+  assets:
+    - assets/
+    - assets/SP/
+    - assets/SSR/
+    - assets/SR/
+    - assets/R/
+    - assets/N/

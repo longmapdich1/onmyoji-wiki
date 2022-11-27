@@ -8,8 +8,6 @@ class WikiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      final navigatorKey = GlobalKey<NavigatorState>();
-
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       builder: (context, child) => DynamicTheme(
@@ -24,7 +22,6 @@ class WikiApp extends StatelessWidget {
           },
           child: MaterialApp(
             theme: getTheme(context),
-            navigatorKey:navigatorKey ,
             title: "Onmyoji Wiki",
             debugShowCheckedModeBanner: false,
             home: const HomePage(),

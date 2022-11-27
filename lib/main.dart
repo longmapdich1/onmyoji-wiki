@@ -8,4 +8,3 @@ Future<void> main() async {
   await preferences.initPreferences();
   runApp(const WikiApp());
 }
-
