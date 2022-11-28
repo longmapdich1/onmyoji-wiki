@@ -18,6 +18,7 @@ dependencies:
   rxdart: ^0.27.7
   flutter_simple_dependency_injection: ^2.0.0
   flutter_screenutil: ^5.6.0
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:
@@ -30,8 +31,11 @@ flutter:
 
   assets:
     - assets/
-    - assets/SP/
-    - assets/SSR/
+    - assets/SP/kiyohime/
+    - assets/SP/enma/
+    - assets/SP/momiji/
+    - assets/SP/orochi/
+    - assets/SSR/jinkougyou/
     - assets/SR/
     - assets/R/
     - assets/N/
