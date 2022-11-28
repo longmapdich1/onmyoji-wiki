@@ -6,7 +6,7 @@ class StyleApp {
     return Colors.grey;
   }
 
-  static TextStyle s14({bool isBold = false}) {
+  static TextStyle s14([bool isBold = false]) {
     FontWeight weight = FontWeight.w400;
     if (isBold) {
       weight = FontWeight.w500;
@@ -18,7 +18,7 @@ class StyleApp {
     );
   }
 
-  static TextStyle s16({bool isBold = false}) {
+  static TextStyle s16([bool isBold = false]) {
     FontWeight weight = FontWeight.w400;
     if (isBold) {
       weight = FontWeight.w500;
@@ -30,7 +30,7 @@ class StyleApp {
     );
   }
 
-  static TextStyle s12({bool isBold = false}) {
+  static TextStyle s12([bool isBold = false]) {
     FontWeight weight = FontWeight.w400;
     if (isBold) {
       weight = FontWeight.w500;
@@ -42,7 +42,7 @@ class StyleApp {
     );
   }
 
-  static TextStyle s36({bool isBold = false}) {
+  static TextStyle s36([bool isBold = false]) {
     FontWeight weight = FontWeight.w400;
     if (isBold) {
       weight = FontWeight.w500;

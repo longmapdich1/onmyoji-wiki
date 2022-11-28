@@ -58,8 +58,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 SizedBox(height: 12.h),
                 TabBar(
-                  // indicator: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(56), color: Colors.red),
+                  indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w),
                   controller: _controller,
                   tabs: [
                     Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),

@@ -17,8 +17,8 @@ ThemeData getTheme(BuildContext context) {
 
 class DynamicTheme extends InheritedWidget {
   final BuildContext context;
-  late ThemeData themeData;
-  late CustomColor customColor;
+  late final ThemeData themeData;
+  late final CustomColor customColor;
 
   DynamicTheme(
     this.context, {
