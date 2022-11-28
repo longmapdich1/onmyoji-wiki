@@ -10,15 +10,16 @@ class Stat {
   final double crit;
   final double critDame;
 
-  Stat(
-      {required this.attack,
-      required this.def,
-      required this.hp,
-      required this.spd,
-      required this.effectHit,
-      required this.effectRes,
-      required this.crit, 
-      required this.critDame,});
+  Stat({
+    required this.attack,
+    required this.def,
+    required this.hp,
+    required this.spd,
+    required this.effectHit,
+    required this.effectRes,
+    required this.crit,
+    required this.critDame,
+  });
 }
 
 class Skill {
@@ -26,6 +27,10 @@ class Skill {
   final String describe;
 
   Skill({required this.name, required this.describe});
+
+  Skill.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        describe = json['describe'];
 }
 
 class Shiki {

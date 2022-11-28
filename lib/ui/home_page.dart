@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -85,12 +85,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildTabView(ShikiType type) {
-    List<Shiki> tempList = _shiki.where((element) => element.type == type).toList();
+    List<Shiki> tempList =
+        _shiki.where((element) => element.type == type).toList();
     return SingleChildScrollView(
       child: Column(
         children: List.generate(
-            tempList.length,
-            (index) => _buildShikiItem(tempList[index])),
+            tempList.length, (index) => _buildShikiItem(tempList[index])),
       ),
     );
   }
@@ -149,16 +149,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             !key.contains("icSSR") &&
             !key.contains("icSP"))
         .toList();
+    // String skill1 = await rootBundle.loadString("assets/SP/enma/skill1");
+    // print(skill1);
     List<String> alreadyShiki = [];
     for (var element in images) {
+      var tempElement = element.toString().split("/");
+      tempElement.removeLast();
+
       final name = element.toString().split("/")[2];
       if (alreadyShiki.contains(name)) continue;
       final type = ShikiType.values
           .byName(element.toString().split("/")[1].toLowerCase());
+      String skill1 =
+          await rootBundle.loadString("${tempElement.join("/")}/skill1.txt");
+      Skill tempSkill1 = Skill.fromJson(jsonDecode(skill1));
       final tempShiki = Shiki(
           id: "${name}1",
           name: name,
-          skills: [],
+          skills: [tempSkill1],
           stat: Stat(
               attack: 144,
               def: 68,
