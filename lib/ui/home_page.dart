@@ -32,54 +32,64 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: FutureBuilder<List<Shiki>>(
-          future: _getListShiki(),
-          builder: (context, snapshot) {
-            final state = snapshot.data;
-            if (state == null) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            _shiki = snapshot.data!;
-            return Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  child: Text(
-                    "Onmyoji Wiki",
-                    style: StyleApp.s36(),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: const SearchBar(),
-                ),
-                SizedBox(height: 12.h),
-                TabBar(
-                  indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w),
-                  controller: _controller,
-                  tabs: [
-                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),
-                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSSR)),
-                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSR)),
-                    Tab(child: ImageAssets.pngAssets(ImageAssets.icR)),
-                    Tab(child: ImageAssets.pngAssets(ImageAssets.icN)),
+      body: Stack(
+        children: [
+          SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: ImageAssets.pngAssets(ImageAssets.imageWallpaper,
+                  fit: BoxFit.fill)),
+          FutureBuilder<List<Shiki>>(
+              future: _getListShiki(),
+              builder: (context, snapshot) {
+                final state = snapshot.data;
+                if (state == null) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                _shiki = snapshot.data!;
+                return Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          bottom: 12.h,
+                          top: MediaQuery.of(context).viewPadding.top + 12.h),
+                      child: Text(
+                        "Onmyoji Wiki",
+                        style: StyleApp.s36(),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: const SearchBar(),
+                    ),
+                    SizedBox(height: 12.h),
+                    TabBar(
+                      indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                      controller: _controller,
+                      tabs: [
+                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),
+                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSSR)),
+                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSR)),
+                        Tab(child: ImageAssets.pngAssets(ImageAssets.icR)),
+                        Tab(child: ImageAssets.pngAssets(ImageAssets.icN)),
+                      ],
+                    ),
+                    Expanded(
+                      child: TabBarView(controller: _controller, children: [
+                        _buildTabView(ShikiType.sp),
+                        _buildTabView(ShikiType.ssr),
+                        _buildTabView(ShikiType.sr),
+                        _buildTabView(ShikiType.r),
+                        _buildTabView(ShikiType.n),
+                      ]),
+                    ),
                   ],
-                ),
-                Expanded(
-                  child: TabBarView(controller: _controller, children: [
-                    _buildTabView(ShikiType.sp),
-                    _buildTabView(ShikiType.ssr),
-                    _buildTabView(ShikiType.sr),
-                    _buildTabView(ShikiType.r),
-                    _buildTabView(ShikiType.n),
-                  ]),
-                ),
-              ],
-            );
-          }),
+                );
+              }),
+        ],
+      ),
     );
   }
 
@@ -97,39 +107,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildShikiItem(Shiki shiki) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          go(
-            context,
-            ShikiDetails(shiki: shiki),
-          );
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(),
-          ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(300.0),
-                child: SizedBox(
-                  height: 64.sp,
-                  child: Hero(
-                    tag: shiki.hashCode,
-                    child: ImageAssets.getAvatarByNameAndType(
-                        shiki.name, shiki.type.name),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            go(
+              context,
+              ShikiDetails(shiki: shiki),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withOpacity(0.2)),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(300.0),
+                  child: SizedBox(
+                    height: 64.sp,
+                    child: Hero(
+                      tag: shiki.hashCode,
+                      child: ImageAssets.getAvatarByNameAndType(
+                          shiki.name, shiki.type.name),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                shiki.name.upperCaseFirst,
-                style: StyleApp.s16(),
-              ),
-            ],
+                SizedBox(width: 8.w),
+                Text(
+                  shiki.name.upperCaseFirst,
+                  style: StyleApp.s20(true),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -144,15 +156,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .decode(manifestJson)
         .keys
         .where((String key) =>
-            key.startsWith('assets/') &&
-            !key.contains("icN") &&
-            !key.contains("icR") &&
-            !key.contains("icSR") &&
-            !key.contains("icSSR") &&
-            !key.contains("icSP"))
+            key.startsWith('assets/') && !key.contains("images"))
         .toList();
-    // String skill1 = await rootBundle.loadString("assets/SP/enma/skill1");
-    // print(skill1);
     List<String> alreadyShiki = [];
     for (var element in images) {
       var tempElement = element.toString().split("/");

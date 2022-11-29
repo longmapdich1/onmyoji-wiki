@@ -30,12 +30,12 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/
+    - assets/images/
     - assets/SP/kiyohime/
     - assets/SP/enma/
     - assets/SP/momiji/
     - assets/SP/orochi/
     - assets/SSR/jinkougyou/
-    - assets/SR/
-    - assets/R/
-    - assets/N/
+    - assets/SR/kairaishi/
+    - assets/R/kappa/
+    - assets/N/parasite/
