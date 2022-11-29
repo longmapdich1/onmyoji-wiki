@@ -15,6 +15,7 @@ class ImageAssets {
   static const icSSR = "$path/$pathImages/icSSR.png";
   static const icSP = "$path/$pathImages/icSP.png";
   static const imageWallpaper = "$path/$pathImages/wallpaper.jpg";
+  static const imageWallpaper2 = "$path/$pathImages/wallpaper2.png";
 
   static Image getAvatarByNameAndType(String name, String type) {
     return pngAssets(
@@ -23,7 +24,8 @@ class ImageAssets {
 
   static Image getFullImageByNameAndType(String name, String type) {
     return pngAssets(
-        "$path/${type.toUpperCase()}/${name.toLowerCase()}/full.png");
+        "$path/${type.toUpperCase()}/${name.toLowerCase()}/full.png",
+        fit: BoxFit.cover);
   }
 
   static Image pngAssets(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/assets.dart';
 import 'package:onmyoji_wiki/common/navigator.dart';
+import 'package:onmyoji_wiki/common/navigator.dart';
 import 'package:onmyoji_wiki/common/theme/style_app.dart';
 import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/search_bar.dart';
@@ -32,65 +33,61 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: ImageAssets.pngAssets(ImageAssets.imageWallpaper,
-                  fit: BoxFit.fill)),
-          FutureBuilder<List<Shiki>>(
-              future: _getListShiki(),
-              builder: (context, snapshot) {
-                final state = snapshot.data;
-                if (state == null) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                _shiki = snapshot.data!;
-                return Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          bottom: 12.h,
-                          top: MediaQuery.of(context).viewPadding.top + 12.h),
-                      child: Text(
-                        "Onmyoji Wiki",
-                        style: StyleApp.s36(),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: const SearchBar(),
-                    ),
-                    SizedBox(height: 12.h),
-                    TabBar(
-                      indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                      controller: _controller,
-                      tabs: [
-                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),
-                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSSR)),
-                        Tab(child: ImageAssets.pngAssets(ImageAssets.icSR)),
-                        Tab(child: ImageAssets.pngAssets(ImageAssets.icR)),
-                        Tab(child: ImageAssets.pngAssets(ImageAssets.icN)),
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(controller: _controller, children: [
-                        _buildTabView(ShikiType.sp),
-                        _buildTabView(ShikiType.ssr),
-                        _buildTabView(ShikiType.sr),
-                        _buildTabView(ShikiType.r),
-                        _buildTabView(ShikiType.n),
-                      ]),
-                    ),
-                  ],
-                );
-              }),
-        ],
+        body: Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage(ImageAssets.imageWallpaper), fit: BoxFit.fill),
       ),
-    );
+      child: FutureBuilder<List<Shiki>>(
+          future: _getListShiki(),
+          builder: (context, snapshot) {
+            final state = snapshot.data;
+            if (state == null) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            _shiki = snapshot.data!;
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: 12.h,
+                      top: MediaQuery.of(context).viewPadding.top + 12.h),
+                  child: Text(
+                    "Onmyoji Wiki",
+                    style: StyleApp.s36(),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: const SearchBar(),
+                ),
+                SizedBox(height: 12.h),
+                TabBar(
+                  indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                  controller: _controller,
+                  tabs: [
+                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),
+                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSSR)),
+                    Tab(child: ImageAssets.pngAssets(ImageAssets.icSR)),
+                    Tab(child: ImageAssets.pngAssets(ImageAssets.icR)),
+                    Tab(child: ImageAssets.pngAssets(ImageAssets.icN)),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(controller: _controller, children: [
+                    _buildTabView(ShikiType.sp),
+                    _buildTabView(ShikiType.ssr),
+                    _buildTabView(ShikiType.sr),
+                    _buildTabView(ShikiType.r),
+                    _buildTabView(ShikiType.n),
+                  ]),
+                ),
+              ],
+            );
+          }),
+    ));
   }
 
   Widget _buildTabView(ShikiType type) {
@@ -112,7 +109,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            go(
+            navigateTo(
               context,
               ShikiDetails(shiki: shiki),
             );

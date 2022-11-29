@@ -26,48 +26,79 @@ class _ShikiDetailsState extends State<ShikiDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 200.sp,
-            width: 200.sp,
-            child: Hero(
-              tag: widget.shiki.hashCode,
-              child: ImageAssets.getFullImageByNameAndType(
-                  widget.shiki.name, widget.shiki.type.name),
+      body: Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage(ImageAssets.imageWallpaper),
+                fit: BoxFit.fill)),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).viewPadding.top + 16.h,
+                      left: 16.w),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        size: 32,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).viewPadding.top),
+                    child: SizedBox(
+                      height: 200.sp,
+                      width: 200.sp,
+                      child: Hero(
+                        tag: widget.shiki.hashCode,
+                        child: ImageAssets.getFullImageByNameAndType(
+                            widget.shiki.name, widget.shiki.type.name),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Text(
-            widget.shiki.name.upperCaseFirst,
-            style: StyleApp.s36(),
-          ),
-          TabBar(
-            labelStyle: StyleApp.s16(true),
-            indicatorPadding: EdgeInsets.symmetric(horizontal: 8.w),
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.grey,
-            tabs: const [
-              Tab(text: "Chỉ số"),
-              Tab(text: "Kỹ năng"),
-              Tab(text: "Truyện ký")
-            ],
-            controller: _tabController,
-          ),
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildStatTab(),
-                  _buildSkillTab(),
-                  _buildStoriesTab(),
-                ],
+            Text(
+              widget.shiki.name.upperCaseFirst,
+              style: StyleApp.s36(),
+            ),
+            TabBar(
+              labelStyle: StyleApp.s16(true),
+              indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
+              labelColor: Colors.blue,
+              unselectedLabelColor: Colors.white,
+              tabs: const [
+                Tab(text: "Chỉ số"),
+                Tab(text: "Kỹ năng"),
+                Tab(text: "Truyện ký")
+              ],
+              controller: _tabController,
+            ),
+            Flexible(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildStatTab(),
+                    _buildSkillTab(),
+                    _buildStoriesTab(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
