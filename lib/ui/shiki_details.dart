@@ -84,6 +84,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
               ],
               controller: _tabController,
             ),
+            SizedBox(height: 4.h),
             Flexible(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -106,21 +107,35 @@ class _ShikiDetailsState extends State<ShikiDetails>
   Widget _buildSkillTab() {
     return SingleChildScrollView(
       child: Column(
-        children: List.generate(
-          widget.shiki.skills.length,
-          (index) => _buildSkillItem(widget.shiki.skills[index]),
-        ),
+        children: List.generate(widget.shiki.skills.length, (index) {
+          return Column(
+            children: [
+              _buildSkillItem(widget.shiki.skills[index], index),
+              if (widget.shiki.skills[index].bonus != null)
+                _buildSkillItem(widget.shiki.skills[index].bonus!, index,true),
+            ],
+          );
+        }),
       ),
     );
   }
 
-  Widget _buildSkillItem(Skill skill) {
+  Widget _buildSkillItem(Skill skill, int index, [bool isBonus = false]) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 12.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(),
+          if (isBonus)
+            CircleAvatar(
+              child: ImageAssets.getBonusSkillByNameTypeAndNumber(
+                  widget.shiki.name, widget.shiki.type.name, index + 1),
+            )
+          else
+            CircleAvatar(
+              child: ImageAssets.getSkillByNameTypeAndNumber(
+                  widget.shiki.name, widget.shiki.type.name, index + 1),
+            ),
           SizedBox(width: 8.w),
           Flexible(
             child: Column(
@@ -128,7 +143,18 @@ class _ShikiDetailsState extends State<ShikiDetails>
               children: [
                 Text(
                   skill.name,
-                  style: StyleApp.s16(true),
+                  style: StyleApp.s20(true),
+                ),
+                Row(
+                  children: [
+                    Text("Tiêu hao: ${skill.cost}", style: StyleApp.s14()),
+                    SizedBox.square(
+                        dimension: 28,
+                        child: ImageAssets.pngAssets(ImageAssets.soul)),
+                    SizedBox(width: 8.w),
+                    Text("Thời gian chờ: ${skill.cooldown}",
+                        style: StyleApp.s14()),
+                  ],
                 ),
                 SizedBox(height: 4.h),
                 Text(skill.describe),
@@ -136,8 +162,10 @@ class _ShikiDetailsState extends State<ShikiDetails>
                   SizedBox(height: 4.h),
                   ...List.generate(
                     skill.levelUp!.length,
-                    (index) =>
-                        Text("Level ${index + 2}: ${skill.levelUp![index]}"),
+                    (index) => Text(
+                      "Level ${index + 2}: ${skill.levelUp![index]}",
+                      style: StyleApp.s14(),
+                    ),
                   ),
                 ]
               ],
@@ -152,29 +180,39 @@ class _ShikiDetailsState extends State<ShikiDetails>
     return Container();
   }
 
-  ListInfo _buildStatTab() {
-    return ListInfo(list: [
-      ListInfoItem(
-          title: "ATK (Tấn công): ",
-          content: widget.shiki.stat.attack.toString()),
-      ListInfoItem(
-          title: "HP (Máu): ", content: widget.shiki.stat.hp.toString()),
-      ListInfoItem(
-          title: "DEF (Thủ): ", content: widget.shiki.stat.def.toString()),
-      ListInfoItem(
-          title: "SPD (Tốc): ", content: widget.shiki.stat.spd.toString()),
-      ListInfoItem(
-          title: "CRIT (Tỉ lệ chí mạng): ",
-          content: "${widget.shiki.stat.crit.toInt()}%"),
-      ListInfoItem(
-          title: "CRIT DMG (Sát thương chí mạng): ",
-          content: "${widget.shiki.stat.critDame.toInt()}%"),
-      ListInfoItem(
-          title: "EFFECT HIT (Tỉ lệ chính xác): ",
-          content: "${widget.shiki.stat.effectHit.toInt()}%"),
-      ListInfoItem(
-          title: "EFFECT RES (Tỉ lệ kháng): ",
-          content: "${widget.shiki.stat.effectRes.toInt()}%"),
-    ]);
+  Widget _buildStatTab() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const Icon(Icons.arrow_forward),
+          ListInfo(list: [
+            ListInfoItem(
+                title: "ATK (Tấn công): ",
+                content: widget.shiki.stat.attack.toString()),
+            ListInfoItem(
+                title: "HP (Máu): ", content: widget.shiki.stat.hp.toString()),
+            ListInfoItem(
+                title: "DEF (Thủ): ",
+                content: widget.shiki.stat.def.toString()),
+            ListInfoItem(
+                title: "SPD (Tốc): ",
+                content: widget.shiki.stat.spd.toString()),
+            ListInfoItem(
+                title: "CRIT (Tỉ lệ chí mạng): ",
+                content: "${widget.shiki.stat.crit.toInt()}%"),
+            ListInfoItem(
+                title: "CRIT DMG (Sát thương chí mạng): ",
+                content: "${widget.shiki.stat.critDame.toInt()}%"),
+            ListInfoItem(
+                title: "EFFECT HIT (Tỉ lệ chính xác): ",
+                content: "${widget.shiki.stat.effectHit.toInt()}%"),
+            ListInfoItem(
+                title: "EFFECT RES (Tỉ lệ kháng): ",
+                content: "${widget.shiki.stat.effectRes.toInt()}%"),
+          ]),
+        ],
+      ),
+    );
   }
 }

@@ -7,8 +7,8 @@ class Stat {
   final int spd;
   final int effectHit;
   final int effectRes;
-  final double crit;
-  final double critDame;
+  final int crit;
+  final int critDame;
 
   Stat({
     required this.attack,
@@ -20,16 +20,8 @@ class Stat {
     required this.crit,
     required this.critDame,
   });
-}
 
-class Skill {
-  final String name;
-  final String describe;
-  final List<String>? levelUp;
-
-  Skill({required this.name, required this.describe, this.levelUp});
-
-  factory Skill.fromJson(Map<String, dynamic> json) {
+  factory Stat.fromJson(Map<String, dynamic> json) {
     List<String> tempLevelUp = [];
     for (int i = 2; i < 10; i++) {
       if (json["level$i"] != null) {
@@ -38,11 +30,55 @@ class Skill {
         break;
       }
     }
-    return Skill(
-      name:  json['name'],
-      describe: json['describe'],
-      levelUp: tempLevelUp,
+    return Stat(
+      attack: json["attack"],
+      def: json["def"],
+      hp: json["hp"],
+      spd: json["spd"],
+      effectHit: json["effectHit"],
+      effectRes: json["effectRes"],
+      crit: json["crit"],
+      critDame: json["critDame"],
     );
+  }
+}
+
+class Skill {
+  final String name;
+  final int cost;
+  final int cooldown;
+  final String describe;
+  final List<String>? levelUp;
+  final Skill? bonus;
+
+  Skill(
+      {required this.name,
+      required this.describe,
+      required this.cost,
+      this.bonus,
+      this.levelUp,
+      this.cooldown = 0});
+
+  factory Skill.fromJson(Map<String, dynamic> json) {
+    List<String> tempLevelUp = [];
+    Skill? bonus;
+    for (int i = 2; i < 10; i++) {
+      if (json["level$i"] != null) {
+        tempLevelUp.add(json['level$i']);
+      } else {
+        break;
+      }
+    }
+    if (json["bonus"] != null) {
+      bonus = Skill.fromJson(json["bonus"]);
+    }
+    return Skill(
+        name: json['name'],
+        describe: json['describe'],
+        levelUp: tempLevelUp,
+        cost: json['cost'],
+        bonus: bonus,
+        cooldown: json['cooldown']);
   }
 }
 
@@ -61,4 +97,16 @@ class Shiki {
       required this.stat,
       required this.type,
       required this.stories});
+
+  static List<Skill> getListSkill(Map<String, dynamic> json) {
+    List<Skill> result = [];
+    for (int i = 1; i < 10; i++) {
+      if (json["skill$i"] != null) {
+        result.add(Skill.fromJson(json["skill$i"]));
+      } else {
+        break;
+      }
+    }
+    return result;
+  }
 }

@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       bottom: 12.h,
                       top: MediaQuery.of(context).viewPadding.top + 12.h),
                   child: Text(
-                    "Onmyoji Wiki",
+                    "Thức thần lục",
                     style: StyleApp.s36(),
                   ),
                 ),
@@ -164,22 +164,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (alreadyShiki.contains(name)) continue;
       final type = ShikiType.values
           .byName(element.toString().split("/")[1].toLowerCase());
-      String skill1 =
-          await rootBundle.loadString("${tempElement.join("/")}/skill1.txt");
-      Skill tempSkill1 = Skill.fromJson(jsonDecode(skill1));
+      String skillPath = 
+          await rootBundle.loadString("${tempElement.join("/")}/skill.json");
+      String statPath =
+          await rootBundle.loadString("${tempElement.join("/")}/stat.json");
+
+      Stat tempStat = Stat.fromJson(jsonDecode(statPath));
       final tempShiki = Shiki(
           id: "${name}1",
           name: name,
-          skills: [tempSkill1],
-          stat: Stat(
-              attack: 144,
-              def: 68,
-              hp: 1128,
-              spd: 118,
-              effectHit: 0,
-              effectRes: 0,
-              crit: 3,
-              critDame: 150),
+          skills: Shiki.getListSkill(jsonDecode(skillPath)),
+          stat: tempStat,
           type: type,
           stories: []);
       list.add(tempShiki);

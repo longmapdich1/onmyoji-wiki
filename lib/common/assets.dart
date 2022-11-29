@@ -14,6 +14,7 @@ class ImageAssets {
   static const icSR = "$path/$pathImages/icSR.png";
   static const icSSR = "$path/$pathImages/icSSR.png";
   static const icSP = "$path/$pathImages/icSP.png";
+  static const soul = "$path/$pathImages/soul.png";
   static const imageWallpaper = "$path/$pathImages/wallpaper.jpg";
   static const imageWallpaper2 = "$path/$pathImages/wallpaper2.png";
 
@@ -25,6 +26,18 @@ class ImageAssets {
   static Image getFullImageByNameAndType(String name, String type) {
     return pngAssets(
         "$path/${type.toUpperCase()}/${name.toLowerCase()}/full.png",
+        fit: BoxFit.cover);
+  }
+
+  static Image getSkillByNameTypeAndNumber(String name, String type,int number) {
+    return pngAssets(
+        "$path/${type.toUpperCase()}/${name.toLowerCase()}/skill$number.png",
+        fit: BoxFit.cover);
+  }
+
+  static Image getBonusSkillByNameTypeAndNumber(String name, String type,int number) {
+    return pngAssets(
+        "$path/${type.toUpperCase()}/${name.toLowerCase()}/skillBonus$number.png",
         fit: BoxFit.cover);
   }
 
