@@ -117,8 +117,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(300.0),
                 child: SizedBox(
                   height: 64.sp,
-                  child: ImageAssets.getAvtarByNameAndType(
-                      shiki.name, shiki.type.name),
+                  child: Hero(
+                    tag: shiki.hashCode,
+                    child: ImageAssets.getAvatarByNameAndType(
+                        shiki.name, shiki.type.name),
+                  ),
                 ),
               ),
               SizedBox(width: 8.w),

@@ -32,8 +32,11 @@ class _ShikiDetailsState extends State<ShikiDetails>
           SizedBox(
             height: 200.sp,
             width: 200.sp,
-            child: ImageAssets.getFullImageByNameAndType(
-                widget.shiki.name, widget.shiki.type.name),
+            child: Hero(
+              tag: widget.shiki.hashCode,
+              child: ImageAssets.getFullImageByNameAndType(
+                  widget.shiki.name, widget.shiki.type.name),
+            ),
           ),
           Text(
             widget.shiki.name.upperCaseFirst,

@@ -8,17 +8,18 @@ class ImageAssets {
   static const pathR = 'R';
   static const pathN = 'N';
 
-  static const icN ="$path/icN.png";
-  static const icR ="$path/icR.png";
-  static const icSR ="$path/icSR.png";
-  static const icSSR ="$path/icSSR.png";
-  static const icSP ="$path/icSP.png";
+  static const icN = "$path/icN.png";
+  static const icR = "$path/icR.png";
+  static const icSR = "$path/icSR.png";
+  static const icSSR = "$path/icSSR.png";
+  static const icSP = "$path/icSP.png";
 
-  static Image getAvtarByNameAndType(String name, String type){
-    return pngAssets("$path/${type.toUpperCase()}/${name.toLowerCase()}/avatar.png");
+  static Image getAvatarByNameAndType(String name, String type) {
+    return pngAssets(
+        "$path/${type.toUpperCase()}/${name.toLowerCase()}/avatar.png");
   }
 
-    static Image getFullImageByNameAndType(String name, String type) {
+  static Image getFullImageByNameAndType(String name, String type) {
     return pngAssets(
         "$path/${type.toUpperCase()}/${name.toLowerCase()}/full.png");
   }
