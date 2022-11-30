@@ -175,7 +175,7 @@ Future<T?> showNativeSheet<T>(
     return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => widget,
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor ?? Colors.transparent,
       elevation: elevation,
       shape: shape,
       clipBehavior: clipBehavior,
@@ -193,7 +193,7 @@ Future<T?> showNativeSheet<T>(
   return showMaterialModalBottomSheet(
     context: context,
     builder: (context) => widget,
-    backgroundColor: backgroundColor,
+    backgroundColor: backgroundColor ?? Colors.transparent,
     elevation: elevation,
     shape: shape,
     clipBehavior: clipBehavior,
@@ -296,7 +296,7 @@ extension NavigateExt on BuildContext {
   }
 
   void pop<T>({T? result, NavigatorState? navigatorState}) {
-    final navigator = navigatorState ??  Navigator.of(this);
+    final navigator = navigatorState ?? Navigator.of(this);
     return navigator.pop(result);
   }
 

@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/assets.dart';
+import 'package:onmyoji_wiki/common/navigator.dart';
 import 'package:onmyoji_wiki/common/theme/style_app.dart';
 import 'package:onmyoji_wiki/common/utils.dart';
+import 'package:onmyoji_wiki/common/widgets/common_bottom_sheet.dart';
 import 'package:onmyoji_wiki/common/widgets/list_info_item.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
 
@@ -63,7 +65,6 @@ class _ShikiDetailsState extends State<ShikiDetails>
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildAvatarContainer(),
-          SizedBox(height: 140.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Container(
@@ -107,24 +108,22 @@ class _ShikiDetailsState extends State<ShikiDetails>
     return Stack(
       clipBehavior: Clip.none,
       children: [
+        Container(height: MediaQuery.of(context).size.height / 2.8),
         Positioned(
-          top: -250,
+          top: -250.h,
           child: Transform.rotate(
             angle: -_animation.value * pi,
-            // angle: 0,
             child: Transform.scale(
               scale: 1.5,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Center(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 375,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 375,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
                     ),
                   ),
                   ...List.generate(
@@ -137,7 +136,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
                             : index == 1
                                 ? MediaQuery.of(context).size.width / 2.39
                                 : MediaQuery.of(context).size.width / 5.5,
-                        top: index == 1 ? -30.h : null),
+                        top: index == 1 ? -20.h : null),
                   ),
                 ],
               ),
@@ -151,7 +150,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
             color: Colors.black,
           ),
         ),
-        Positioned.fill(
+        Positioned(
           child: Align(
             alignment: Alignment.topCenter,
             child: Hero(
@@ -164,10 +163,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
                   shape: BoxShape.circle,
                   color: Colors.white,
                   boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 3.0,
-                    )
+                    BoxShadow(color: Colors.black, blurRadius: 3.0)
                   ],
                   image: DecorationImage(
                       image: AssetImage(
@@ -184,44 +180,28 @@ class _ShikiDetailsState extends State<ShikiDetails>
     );
   }
 
-  Widget _buildCircleContainer(
-      {required Skill skill,
-      required int index,
-      double? left,
-      double? top,
-      bool isBonus = false}) {
+  Widget _buildCircleContainer({
+    required Skill skill,
+    required int index,
+    double? left,
+    double? top,
+  }) {
     return Positioned(
       left: left,
       top: top,
+      width: 60.sp,
+      height: 60.sp,
       child: InkWell(
-        onTap: () {},
-        child: Container(
-            width: 60.sp,
-            height: 60.sp,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 0.1,
-                  blurRadius: 1,
-                  offset: const Offset(0, -2), // changes position of shadow
-                ),
-              ],
-            ),
-            child: RotatedBox(
-              quarterTurns: 2,
-              child: isBonus
-                  ? CircleAvatar(
-                      child: ImageAssets.getBonusSkillByNameTypeAndNumber(
-                          widget.shiki.name, widget.shiki.type.name, index + 1),
-                    )
-                  : CircleAvatar(
-                      child: ImageAssets.getSkillByNameTypeAndNumber(
-                          widget.shiki.name, widget.shiki.type.name, index + 1),
-                    ),
-            )),
+        customBorder: const CircleBorder(),
+        onTap: () {
+          showNativeSheet(
+              context, _SkillBottomSheet(skill, index, widget.shiki));
+        },
+        child: RotatedBox(
+          quarterTurns: 2,
+          child: ImageAssets.getSkillByNameTypeAndNumber(
+              widget.shiki.name, widget.shiki.type.name, index + 1),
+        ),
       ),
     );
   }
@@ -286,5 +266,67 @@ class _CustomRoundClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
     return true;
+  }
+}
+
+class _SkillBottomSheet extends StatelessWidget {
+  const _SkillBottomSheet(this.skill, this.index, this.shiki);
+  final Shiki shiki;
+  final Skill skill;
+  final int index;
+
+  Widget _buildSkillItem({required Skill skill, required Widget image}) {
+    return Column(
+      children: [
+        Text(
+          skill.name,
+          style: StyleApp.s36(true),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          child: image,
+        ),
+        Text(skill.describe, style: StyleApp.s14()),
+        SizedBox(height: 4.h),
+        if (skill.levelUp != null) ...[
+          SizedBox(height: 4.h),
+          ...List.generate(
+            skill.levelUp!.length,
+            (index) => Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Level ${index + 2}: ${skill.levelUp![index]}",
+                style: StyleApp.s14(),
+              ),
+            ),
+          ),
+        ],
+        SizedBox(height: 16.h)
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CommonBottomSheet(
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: Column(
+          children: [
+            _buildSkillItem(
+              skill: skill,
+              image: ImageAssets.getSkillByNameTypeAndNumber(
+                  shiki.name, shiki.type.name, index + 1),
+            ),
+            if (skill.bonus != null)
+              _buildSkillItem(
+                skill: skill.bonus!,
+                image: ImageAssets.getBonusSkillByNameTypeAndNumber(
+                    shiki.name, shiki.type.name, index + 1),
+              )
+          ],
+        ),
+      ),
+    );
   }
 }
