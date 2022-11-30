@@ -60,16 +60,30 @@ class _ShikiDetailsState extends State<ShikiDetails>
         ),
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildAvatarContainer(),
-          SizedBox(height: 150.h),
-          TabBar(
-            labelStyle: StyleApp.s16(true),
-            indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.black,
-            tabs: const [Tab(text: "Chỉ số"), Tab(text: "Truyện ký")],
-            controller: _tabController,
+          SizedBox(height: 140.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Container(
+              height: 40.h,
+              padding: EdgeInsets.all(2.sp),
+              decoration: BoxDecoration(
+                color: const Color(0xffF3F6FF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TabBar(
+                indicator: BoxDecoration(
+                    borderRadius: BorderRadius.circular(56),
+                    color: Colors.white),
+                labelStyle: StyleApp.s16(true),
+                labelColor: Colors.blue,
+                unselectedLabelColor: Colors.black,
+                tabs: const [Tab(text: "Chỉ số"), Tab(text: "Truyện ký")],
+                controller: _tabController,
+              ),
+            ),
           ),
           SizedBox(height: 4.h),
           Flexible(
@@ -119,11 +133,10 @@ class _ShikiDetailsState extends State<ShikiDetails>
                         skill: widget.shiki.skills[index],
                         index: index,
                         left: index == 0
-                            ? MediaQuery.of(context).size.width / 2.5 + 100.w
+                            ? MediaQuery.of(context).size.width / 1.52
                             : index == 1
                                 ? MediaQuery.of(context).size.width / 2.39
-                                : MediaQuery.of(context).size.width / 2.5 -
-                                    85.w,
+                                : MediaQuery.of(context).size.width / 5.5,
                         top: index == 1 ? -30.h : null),
                   ),
                 ],
@@ -180,33 +193,36 @@ class _ShikiDetailsState extends State<ShikiDetails>
     return Positioned(
       left: left,
       top: top,
-      child: Container(
-          width: 60.sp,
-          height: 60.sp,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 0.1,
-                blurRadius: 1,
-                offset: const Offset(0, -2), // changes position of shadow
-              ),
-            ],
-          ),
-          child: RotatedBox(
-            quarterTurns: 2,
-            child: isBonus
-                ? CircleAvatar(
-                    child: ImageAssets.getBonusSkillByNameTypeAndNumber(
-                        widget.shiki.name, widget.shiki.type.name, index + 1),
-                  )
-                : CircleAvatar(
-                    child: ImageAssets.getSkillByNameTypeAndNumber(
-                        widget.shiki.name, widget.shiki.type.name, index + 1),
-                  ),
-          )),
+      child: InkWell(
+        onTap: () {},
+        child: Container(
+            width: 60.sp,
+            height: 60.sp,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 0.1,
+                  blurRadius: 1,
+                  offset: const Offset(0, -2), // changes position of shadow
+                ),
+              ],
+            ),
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: isBonus
+                  ? CircleAvatar(
+                      child: ImageAssets.getBonusSkillByNameTypeAndNumber(
+                          widget.shiki.name, widget.shiki.type.name, index + 1),
+                    )
+                  : CircleAvatar(
+                      child: ImageAssets.getSkillByNameTypeAndNumber(
+                          widget.shiki.name, widget.shiki.type.name, index + 1),
+                    ),
+            )),
+      ),
     );
   }
 
