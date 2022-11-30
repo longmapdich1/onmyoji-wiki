@@ -121,8 +121,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 color: Colors.white.withOpacity(0.2)),
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(300.0),
+                ClipOval(
                   child: SizedBox(
                     height: 64.sp,
                     child: Hero(
@@ -164,7 +163,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (alreadyShiki.contains(name)) continue;
       final type = ShikiType.values
           .byName(element.toString().split("/")[1].toLowerCase());
-      String skillPath = 
+      String skillPath =
           await rootBundle.loadString("${tempElement.join("/")}/skill.json");
       String statPath =
           await rootBundle.loadString("${tempElement.join("/")}/stat.json");
