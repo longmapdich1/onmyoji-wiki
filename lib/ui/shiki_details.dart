@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/assets.dart';
@@ -94,7 +96,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
         Positioned(
           top: -250,
           child: Transform.rotate(
-            angle: -_animation.value * 3.16,
+            angle: -_animation.value * pi,
             // angle: 0,
             child: Transform.scale(
               scale: 1.5,
@@ -111,19 +113,19 @@ class _ShikiDetailsState extends State<ShikiDetails>
                       ),
                     ),
                   ),
-                  Positioned(
-                      left: MediaQuery.of(context).size.width / 2.5 + 100.w,
-                      child: _buildCircleContainer(widget.shiki.skills[0], 0)),
-                  Positioned(
-                      top: -30,
-                      left: MediaQuery.of(context).size.width / 2.35,
-                      child: Align(
-                          alignment: Alignment.topCenter,
-                          child: _buildCircleContainer(
-                              widget.shiki.skills[1], 1))),
-                  Positioned(
-                      left: MediaQuery.of(context).size.width / 2.5 - 80.w,
-                      child: _buildCircleContainer(widget.shiki.skills[2], 2)),
+                  ...List.generate(
+                    widget.shiki.skills.length,
+                    (index) => _buildCircleContainer(
+                        skill: widget.shiki.skills[index],
+                        index: index,
+                        left: index == 0
+                            ? MediaQuery.of(context).size.width / 2.5 + 100.w
+                            : index == 1
+                                ? MediaQuery.of(context).size.width / 2.39
+                                : MediaQuery.of(context).size.width / 2.5 -
+                                    85.w,
+                        top: index == 1 ? -30.h : null),
+                  ),
                 ],
               ),
             ),
@@ -143,8 +145,8 @@ class _ShikiDetailsState extends State<ShikiDetails>
               tag: widget.shiki.hashCode,
               child: Container(
                 margin: EdgeInsets.only(top: 30.h),
-                height: 120,
-                width: 120,
+                height: 120.sp,
+                width: 120.sp,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
@@ -169,35 +171,43 @@ class _ShikiDetailsState extends State<ShikiDetails>
     );
   }
 
-  Container _buildCircleContainer(Skill skill, int index,
-      [bool isBonus = false]) {
-    return Container(
-        width: 60.sp,
-        height: 60.sp,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 0.1,
-              blurRadius: 1,
-              offset: const Offset(0, -2), // changes position of shadow
-            ),
-          ],
-        ),
-        child: RotatedBox(
-          quarterTurns: 2,
-          child: isBonus
-              ? CircleAvatar(
-                  child: ImageAssets.getBonusSkillByNameTypeAndNumber(
-                      widget.shiki.name, widget.shiki.type.name, index + 1),
-                )
-              : CircleAvatar(
-                  child: ImageAssets.getSkillByNameTypeAndNumber(
-                      widget.shiki.name, widget.shiki.type.name, index + 1),
-                ),
-        ));
+  Widget _buildCircleContainer(
+      {required Skill skill,
+      required int index,
+      double? left,
+      double? top,
+      bool isBonus = false}) {
+    return Positioned(
+      left: left,
+      top: top,
+      child: Container(
+          width: 60.sp,
+          height: 60.sp,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 0.1,
+                blurRadius: 1,
+                offset: const Offset(0, -2), // changes position of shadow
+              ),
+            ],
+          ),
+          child: RotatedBox(
+            quarterTurns: 2,
+            child: isBonus
+                ? CircleAvatar(
+                    child: ImageAssets.getBonusSkillByNameTypeAndNumber(
+                        widget.shiki.name, widget.shiki.type.name, index + 1),
+                  )
+                : CircleAvatar(
+                    child: ImageAssets.getSkillByNameTypeAndNumber(
+                        widget.shiki.name, widget.shiki.type.name, index + 1),
+                  ),
+          )),
+    );
   }
 
   Widget _buildStoriesTab() {
