@@ -17,11 +17,8 @@ extension UpperCaseFirst on String {
       for (int i = 0; i < lengthSubString + 1; i++) {
         result.add(
           TextSpan(
-            text: substring(
-                    index,
-                    i == lengthSubString
-                        ? length - 1
-                        : indexOf("'", index + 1) + 1)
+            text: substring(index,
+                    i == lengthSubString ? length : indexOf("'", index + 1) + 1)
                 .replaceAll("'", ""),
             style: StyleApp.s14().copyWith(
               color: Colors.black,
