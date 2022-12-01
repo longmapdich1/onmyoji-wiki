@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/assets.dart';
 import 'package:onmyoji_wiki/common/navigator.dart';
-import 'package:onmyoji_wiki/common/navigator.dart';
 import 'package:onmyoji_wiki/common/theme/style_app.dart';
 import 'package:onmyoji_wiki/common/utils.dart';
+import 'package:onmyoji_wiki/common/widgets/list_stagger.dart';
 import 'package:onmyoji_wiki/common/widgets/search_bar.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
 import 'package:onmyoji_wiki/ui/shiki_details.dart';
@@ -93,11 +93,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildTabView(ShikiType type) {
     List<Shiki> tempList =
         _shiki.where((element) => element.type == type).toList();
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(
-            tempList.length, (index) => _buildShikiItem(tempList[index])),
-      ),
+    return ListStagger<Shiki>(
+      list: tempList,
+      itemWidget: _buildShikiItem,
     );
   }
 
@@ -124,11 +122,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ClipOval(
                   child: SizedBox(
                     height: 64.sp,
-                    child: Hero(
-                      tag: shiki.hashCode,
-                      child: ImageAssets.getAvatarByNameAndType(
-                          shiki.name, shiki.type.name),
-                    ),
+                    child: ImageAssets.getAvatarByNameAndType(
+                        shiki.name, shiki.type.name),
                   ),
                 ),
                 SizedBox(width: 8.w),
@@ -152,7 +147,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .decode(manifestJson)
         .keys
         .where((String key) =>
-            key.startsWith('assets/') && !key.contains("images"))
+            key.startsWith('assets/') && !key.contains("images") && !key.contains("font"))
         .toList();
     List<String> alreadyShiki = [];
     for (var element in images) {

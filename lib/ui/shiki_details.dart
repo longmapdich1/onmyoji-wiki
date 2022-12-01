@@ -9,6 +9,7 @@ import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/common_bottom_sheet.dart';
 import 'package:onmyoji_wiki/common/widgets/list_info_item.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
+import 'package:onmyoji_wiki/models/skill.dart';
 
 class ShikiDetails extends StatefulWidget {
   const ShikiDetails({super.key, required this.shiki});
@@ -81,7 +82,12 @@ class _ShikiDetailsState extends State<ShikiDetails>
                 labelStyle: StyleApp.s16(true),
                 labelColor: Colors.blue,
                 unselectedLabelColor: Colors.black,
-                tabs: const [Tab(text: "Chỉ số"), Tab(text: "Truyện ký")],
+                tabs: [
+                  Tab(child: Text("Chỉ số", style: StyleApp.s16(true))),
+                  Tab(
+                    child: Text("Truyện ký", style: StyleApp.s16(true)),
+                  ),
+                ],
                 controller: _tabController,
               ),
             ),
@@ -132,10 +138,10 @@ class _ShikiDetailsState extends State<ShikiDetails>
                         skill: widget.shiki.skills[index],
                         index: index,
                         left: index == 0
-                            ? MediaQuery.of(context).size.width / 1.52
+                            ? MediaQuery.of(context).size.width / 1.5
                             : index == 1
-                                ? MediaQuery.of(context).size.width / 2.39
-                                : MediaQuery.of(context).size.width / 5.5,
+                                ? MediaQuery.of(context).size.width / 2.35
+                                : MediaQuery.of(context).size.width / 5.2,
                         top: index == 1 ? -20.h : null),
                   ),
                 ],
@@ -153,25 +159,22 @@ class _ShikiDetailsState extends State<ShikiDetails>
         Positioned(
           child: Align(
             alignment: Alignment.topCenter,
-            child: Hero(
-              tag: widget.shiki.hashCode,
-              child: Container(
-                margin: EdgeInsets.only(top: 30.h),
-                height: 120.sp,
-                width: 120.sp,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black, blurRadius: 3.0)
-                  ],
-                  image: DecorationImage(
-                      image: AssetImage(
-                        ImageAssets.getAvatarPathByNameAndType(
-                            widget.shiki.name, widget.shiki.type.name),
-                      ),
-                      fit: BoxFit.cover),
-                ),
+            child: Container(
+              margin: EdgeInsets.only(top: 30.h),
+              height: 120.sp,
+              width: 120.sp,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(color: Colors.black, blurRadius: 3.0)
+                ],
+                image: DecorationImage(
+                    image: AssetImage(
+                      ImageAssets.getAvatarPathByNameAndType(
+                          widget.shiki.name, widget.shiki.type.name),
+                    ),
+                    fit: BoxFit.cover),
               ),
             ),
           ),
@@ -189,8 +192,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
     return Positioned(
       left: left,
       top: top,
-      width: 60.sp,
-      height: 60.sp,
+      height: 52.sp,
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: () {
@@ -285,6 +287,10 @@ class _SkillBottomSheet extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(vertical: 12.h),
           child: image,
+        ),
+        Text(
+          "Loại: ${skill.type.toVietNamString}",
+          style: StyleApp.s16(true),
         ),
         Text(skill.describe, style: StyleApp.s14()),
         SizedBox(height: 4.h),

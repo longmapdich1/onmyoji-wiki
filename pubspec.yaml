@@ -30,6 +30,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  fonts:
+    - family: Game
+      fonts:
+        - asset: assets/font/Itim-Regular.ttf
+
   assets:
     - assets/images/
     - assets/SP/kiyohime/

@@ -3,7 +3,7 @@ import 'package:onmyoji_wiki/common/theme/custom_colors.dart';
 
 ///Config ThemeData For DarkMode
 ThemeData getTheme(BuildContext context) {
-  final baseTheme = ThemeData.light();
+  final baseTheme = ThemeData(fontFamily: 'Game',brightness: Brightness.light);
   return baseTheme.copyWith(
     backgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
@@ -11,7 +11,7 @@ ThemeData getTheme(BuildContext context) {
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.black),
     ),
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: Colors.white
   );
 }
 
