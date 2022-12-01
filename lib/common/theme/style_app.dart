@@ -15,6 +15,7 @@ class StyleApp {
       fontSize: 14.sp,
       fontWeight: weight,
       height: (20 / 14).sp,
+      fontFamily: "Game",
     );
   }
 

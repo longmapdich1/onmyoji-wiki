@@ -292,21 +292,43 @@ class _SkillBottomSheet extends StatelessWidget {
           "Loại: ${skill.type.toVietNamString}",
           style: StyleApp.s16(true),
         ),
-        Text(skill.describe, style: StyleApp.s14()),
-        SizedBox(height: 4.h),
-        if (skill.levelUp != null) ...[
-          SizedBox(height: 4.h),
-          ...List.generate(
-            skill.levelUp!.length,
-            (index) => Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Level ${index + 2}: ${skill.levelUp![index]}",
-                style: StyleApp.s14(),
+        // Text(skill.describe, style: StyleApp.s14()),
+        skill.describe.textWithBold,
+        SizedBox(height: 8.h),
+        ...List.generate(
+          skill.levelUp.length,
+          (index) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Cấp ${index + 2}: ",
+                style: StyleApp.s14().copyWith(fontWeight: FontWeight.w700),
               ),
-            ),
+              Flexible(
+                child: skill.levelUp[index].textWithBold,
+              ),
+            ],
           ),
-        ],
+        ),
+        SizedBox(height: 8.h),
+        ...List.generate(
+          skill.note.length,
+          (index) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${skill.note[index].name}: ",
+                style: StyleApp.s14().copyWith(fontWeight: FontWeight.w700),
+              ),
+              Flexible(
+                child: Text(
+                  skill.note[index].describe,
+                  style: StyleApp.s14(),
+                ),
+              ),
+            ],
+          ),
+        ),
         SizedBox(height: 16.h)
       ],
     );
