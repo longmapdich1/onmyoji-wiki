@@ -10,7 +10,9 @@ import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/list_stagger.dart';
 import 'package:onmyoji_wiki/common/widgets/search_bar.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
+import 'package:onmyoji_wiki/models/skill.dart';
 import 'package:onmyoji_wiki/ui/shiki_details.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,13 +23,45 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _controller;
-
+  final supabase = Supabase.instance.client;
   late List<Shiki> _shiki;
 
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 5, vsync: this);
+    fetchData();
+  }
+
+  @override
+  void dispose() {
+    supabase.dispose();
+    super.dispose();
+  }
+
+  Future<void> fetchData() async {
+    final dataShiki = await supabase.from('Shiki').select<PostgrestList>();
+    for (int i = 0; i < dataShiki.length; i++) {
+      final dataSkill = await supabase
+          .from('LinkSkillAndNote')
+          .select<PostgrestList>("""
+          Skill(
+            *
+          ),
+          SkillNote(
+            *
+          )
+""")
+          .eq("Skill.shiki", "${dataShiki[i]["id"]}");
+      print(dataSkill);
+      for (int j = 0; j < dataSkill.length; j++) {
+        final dataLevelUp = await supabase
+            .from('SkillLevelUp')
+            .select()
+            .eq("idSkill", dataSkill[j]["Skill"]["id"]);
+      }
+      // var tempShiki = Shiki.fromJson(dataShiki[i], dataSkill[i]);
+    }
   }
 
   @override
@@ -147,7 +181,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         .decode(manifestJson)
         .keys
         .where((String key) =>
-            key.startsWith('assets/') && !key.contains("images") && !key.contains("font"))
+            key.startsWith('assets/') &&
+            !key.contains("images") &&
+            !key.contains("font"))
         .toList();
     List<String> alreadyShiki = [];
     for (var element in images) {
@@ -165,12 +201,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       Stat tempStat = Stat.fromJson(jsonDecode(statPath));
       final tempShiki = Shiki(
-          id: "${name}1",
-          name: name,
-          skills: Shiki.getListSkill(jsonDecode(skillPath)),
-          stat: tempStat,
-          type: type,
-          stories: []);
+        id: "${name}1",
+        name: name,
+        skills: Shiki.getListSkill(jsonDecode(skillPath)),
+        stat: tempStat,
+        type: type,
+      );
       list.add(tempShiki);
       alreadyShiki.add(name);
     }

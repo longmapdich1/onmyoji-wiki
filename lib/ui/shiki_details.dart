@@ -346,12 +346,12 @@ class _SkillBottomSheet extends StatelessWidget {
               image: ImageAssets.getSkillByNameTypeAndNumber(
                   shiki.name, shiki.type.name, index + 1),
             ),
-            if (skill.bonus != null)
-              _buildSkillItem(
-                skill: skill.bonus!,
-                image: ImageAssets.getBonusSkillByNameTypeAndNumber(
-                    shiki.name, shiki.type.name, index + 1),
-              )
+            // if (skill.bonus != null)
+            //   _buildSkillItem(
+            //     skill: skill.bonus!,
+            //     image: ImageAssets.getBonusSkillByNameTypeAndNumber(
+            //         shiki.name, shiki.type.name, index + 1),
+            //   )
           ],
         ),
       ),
