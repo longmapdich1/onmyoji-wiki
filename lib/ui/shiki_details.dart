@@ -126,7 +126,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 375,
+                    height: 375.h,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
@@ -161,8 +161,8 @@ class _ShikiDetailsState extends State<ShikiDetails>
             alignment: Alignment.topCenter,
             child: Container(
               margin: EdgeInsets.only(top: 30.h),
-              height: 120.sp,
-              width: 120.sp,
+              height: 108.sp,
+              width: 108.sp,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
@@ -293,7 +293,9 @@ class _SkillBottomSheet extends StatelessWidget {
           style: StyleApp.s16(true),
         ),
         // Text(skill.describe, style: StyleApp.s14()),
-        skill.describe.textWithBold,
+        Align(
+            alignment: Alignment.centerLeft,
+            child: skill.describe.textWithBold),
         SizedBox(height: 8.h),
         ...List.generate(
           skill.levelUp.length,
