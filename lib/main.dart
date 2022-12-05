@@ -8,7 +8,7 @@ Future<void> main() async {
 
   const supabaseKey =  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqbG94c3lrd3J1bmF1eHhrZGhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk5NDc3OTYsImV4cCI6MTk4NTUyMzc5Nn0.WWeewEV1kKtT7hbrfdBG0g3v3wWc9Dnshob2sEzNQ2g';
 
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey,schema: "public");
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
   runApp(const WikiApp());
 }

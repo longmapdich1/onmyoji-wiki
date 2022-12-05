@@ -46,6 +46,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
   @override
   void dispose() {
     _animationController.dispose();
+    supabase.dispose();
     super.dispose();
   }
 
