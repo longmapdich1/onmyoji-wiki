@@ -1,6 +1,15 @@
 import 'package:onmyoji_wiki/models/skill.dart';
 
-enum ShikiType { n, r, sr, ssr, sp }
+enum ShikiType {
+  n(1),
+  r(2),
+  sr(3),
+  ssr(4),
+  sp(5);
+
+  final int fromJson;
+  const ShikiType(this.fromJson);
+}
 
 class Stat {
   final int attack;
@@ -24,14 +33,6 @@ class Stat {
   });
 
   factory Stat.fromJson(Map<String, dynamic> json) {
-    List<String> tempLevelUp = [];
-    for (int i = 2; i < 10; i++) {
-      if (json["level$i"] != null) {
-        tempLevelUp.add(json['level$i']);
-      } else {
-        break;
-      }
-    }
     return Stat(
       attack: json["attack"],
       def: json["def"],
@@ -46,11 +47,12 @@ class Stat {
 }
 
 class Shiki {
-  final String id;
+  final int id;
   final String name;
   final List<Skill> skills;
   final Stat stat;
   final ShikiType type;
+  final String? image;
 
   Shiki({
     required this.id,
@@ -58,24 +60,18 @@ class Shiki {
     required this.skills,
     required this.stat,
     required this.type,
+    this.image,
   });
 
-  static List<Skill> getListSkill(List<Map<String, dynamic>> json) {
-    List<Skill> result = [];
-    for (var element in json) {
-      // result.add(Skill.fromJson(element));
-    }
-    return result;
-  }
-
   factory Shiki.fromJson(
-      Map<String, dynamic> jsonShiki, Map<String, dynamic> jsonSkill) {
+      Map<String, dynamic> json, List<Skill> listSkill) {
     return Shiki(
-      id: jsonShiki["id"],
-      name: jsonShiki["name"],
-      skills: getListSkill(jsonShiki['skills']),
-      stat: Stat.fromJson(jsonShiki['stat']),
-      type: ShikiType.values.byName(jsonShiki["type"]),
+      id: json["id"],
+      name: json["name"],
+      skills: listSkill,
+      stat: Stat.fromJson(json['Stat']),
+      type: ShikiType.values.firstWhere((element) => element.fromJson == json['type']),
+      image: json["image"],
     );
   }
 }

@@ -1,20 +1,20 @@
 enum SkillType {
-  normal("Đánh thường"),
-  passive("Nội tại"),
-  active("Chủ động");
+  normal("Đánh thường", 1),
+  passive("Nội tại", 2),
+  active("Chủ động", 3);
 
   final String toVietNamString;
-  const SkillType(this.toVietNamString);
+  final int fromJson;
+  const SkillType(this.toVietNamString, this.fromJson);
 }
 
 class Note {
-  final int id;
   final String name;
   final String describe;
 
-  Note({required this.id, required this.name, required this.describe});
+  Note({required this.name, required this.describe});
   factory Note.fromJson(Map<String, dynamic> json) {
-    return Note(id: json["id"], name: json["name"], describe: json["describe"]);
+    return Note(name: json["name"], describe: json["describe"]);
   }
 }
 
@@ -28,7 +28,7 @@ class Skill {
   final SkillType type;
   final int? bonusId;
   final List<Note> note;
-  final String? image;
+  final String image;
 
   Skill(
       {required this.id,
@@ -36,40 +36,36 @@ class Skill {
       required this.describe,
       required this.cost,
       required this.type,
+      required this.image,
       this.bonusId,
-      this.image,
       this.levelUp = const [],
       this.note = const [],
       this.cooldown = 0});
 
-  factory Skill.fromJson(
-      Map<String, dynamic> json, List<Map<String, dynamic>> jsonLevelUp) {
+  factory Skill.fromJson(Map<String, dynamic> json) {
     List<String> tempLevelUp = [];
     List<Note> note = [];
-    if (jsonLevelUp.isNotEmpty) {
-      for (int i = 2; i < 10; i++) {
-        if (json["level$i"] != null) {
-          tempLevelUp.add(json['level$i']);
-        } else {
-          break;
-        }
+    if (json["SkillLevelUp"].isNotEmpty) {
+      for (int i = 0; i < json["SkillLevelUp"].length; i++) {
+        tempLevelUp.add(json["SkillLevelUp"][i]["content"]);
       }
     }
 
-    if (json['SkillNote'] != null) {
-      for (var element in json["SkillNote"]) {
-        note.add(Note.fromJson(element));
+    if (json['LinkSkillAndNote'] != null) {
+      for (int i = 0; i< json["LinkSkillAndNote"].length; i++) {
+        note.add(Note.fromJson(json["LinkSkillAndNote"][i]["SkillNote"]));
       }
     }
     return Skill(
-      id: json['Skill']['id'],
-      name: json['Skill']['name'],
-      describe: json['Skill']['describe'],
+      id: json['id'],
+      image: json['image'],
+      name: json['name'],
+      describe: json['describe'],
       levelUp: tempLevelUp,
-      cost: json['Skill']['cost'],
-      bonusId: json['Skill']['bonus'],
-      cooldown: json['Skill']['cooldown'],
-      type: SkillType.values.byName(json['Skill']['type']),
+      cost: json['cost'],
+      bonusId: json['bonus'],
+      cooldown: json['cooldown'],
+      type: SkillType.values.firstWhere((element) => element.fromJson == json['type']),
       note: note,
     );
   }

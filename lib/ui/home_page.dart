@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onmyoji_wiki/common/assets.dart';
@@ -25,12 +23,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _controller;
   final supabase = Supabase.instance.client;
   late List<Shiki> _shiki;
+  late Map<int, String> _listTemp;
 
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 5, vsync: this);
-    fetchData();
   }
 
   @override
@@ -39,29 +37,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> fetchData() async {
-    final dataShiki = await supabase.from('Shiki').select<PostgrestList>();
+  Future<List<Shiki>> _fetchData() async {
+    List<Shiki> result = [];
+    final dataShiki = await supabase.from('Shiki').select<PostgrestList>('''
+      id,name,type,image,
+      Stat(*) 
+''');
+
     for (int i = 0; i < dataShiki.length; i++) {
-      final dataSkill = await supabase
-          .from('LinkSkillAndNote')
-          .select<PostgrestList>("""
-          Skill(
-            *
+      final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
+          id,name,describe,cost,bonus,cooldown,type,image,
+          LinkSkillAndNote(
+            SkillNote(name, describe)
           ),
-          SkillNote(
-            *
+          SkillLevelUp(
+            content
           )
-""")
-          .eq("Skill.shiki", "${dataShiki[i]["id"]}");
-      print(dataSkill);
-      for (int j = 0; j < dataSkill.length; j++) {
-        final dataLevelUp = await supabase
-            .from('SkillLevelUp')
-            .select()
-            .eq("idSkill", dataSkill[j]["Skill"]["id"]);
+''').eq("shiki", "${dataShiki[i]["id"]}").order("id", ascending: true);
+      // print(dataSkill[1]);
+      List<Skill> tempList = [];
+      for (var element in dataSkill) {
+        tempList.add(Skill.fromJson(element));
       }
-      // var tempShiki = Shiki.fromJson(dataShiki[i], dataSkill[i]);
+      Shiki tempShiki = Shiki.fromJson(dataShiki[i], tempList);
+      result.add(tempShiki);
     }
+    return result;
   }
 
   @override
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             image: AssetImage(ImageAssets.imageWallpaper), fit: BoxFit.fill),
       ),
       child: FutureBuilder<List<Shiki>>(
-          future: _getListShiki(),
+          future: _fetchData(),
           builder: (context, snapshot) {
             final state = snapshot.data;
             if (state == null) {
@@ -153,13 +154,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 color: Colors.white.withOpacity(0.2)),
             child: Row(
               children: [
-                ClipOval(
-                  child: SizedBox(
-                    height: 64.sp,
-                    child: ImageAssets.getAvatarByNameAndType(
-                        shiki.name, shiki.type.name),
+                if (shiki.image != null)
+                  ClipOval(
+                    child: SizedBox(
+                      height: 64.sp,
+                      child: Image.memory(
+                        base64Decode(shiki.image!),
+                      ),
+                    ),
                   ),
-                ),
                 SizedBox(width: 8.w),
                 Text(
                   shiki.name.upperCaseFirst,
@@ -171,45 +174,5 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
     );
-  }
-
-  Future<List<Shiki>> _getListShiki() async {
-    Set<Shiki> list = {};
-    final manifestJson =
-        await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
-    final List images = json
-        .decode(manifestJson)
-        .keys
-        .where((String key) =>
-            key.startsWith('assets/') &&
-            !key.contains("images") &&
-            !key.contains("font"))
-        .toList();
-    List<String> alreadyShiki = [];
-    for (var element in images) {
-      var tempElement = element.toString().split("/");
-      tempElement.removeLast();
-
-      final name = element.toString().split("/")[2];
-      if (alreadyShiki.contains(name)) continue;
-      final type = ShikiType.values
-          .byName(element.toString().split("/")[1].toLowerCase());
-      String skillPath =
-          await rootBundle.loadString("${tempElement.join("/")}/skill.json");
-      String statPath =
-          await rootBundle.loadString("${tempElement.join("/")}/stat.json");
-
-      Stat tempStat = Stat.fromJson(jsonDecode(statPath));
-      final tempShiki = Shiki(
-        id: "${name}1",
-        name: name,
-        skills: Shiki.getListSkill(jsonDecode(skillPath)),
-        stat: tempStat,
-        type: type,
-      );
-      list.add(tempShiki);
-      alreadyShiki.add(name);
-    }
-    return list.toList();
   }
 }

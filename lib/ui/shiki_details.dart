@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -126,14 +127,14 @@ class _ShikiDetailsState extends State<ShikiDetails>
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 375,
+                    height: 375.h,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
                     ),
                   ),
                   ...List.generate(
-                    widget.shiki.skills.length,
+                    3,
                     (index) => _buildCircleContainer(
                         skill: widget.shiki.skills[index],
                         index: index,
@@ -200,10 +201,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
               context, _SkillBottomSheet(skill, index, widget.shiki));
         },
         child: RotatedBox(
-          quarterTurns: 2,
-          child: ImageAssets.getSkillByNameTypeAndNumber(
-              widget.shiki.name, widget.shiki.type.name, index + 1),
-        ),
+            quarterTurns: 2, child: Image.memory(base64Decode(skill.image))),
       ),
     );
   }
@@ -343,15 +341,16 @@ class _SkillBottomSheet extends StatelessWidget {
           children: [
             _buildSkillItem(
               skill: skill,
-              image: ImageAssets.getSkillByNameTypeAndNumber(
-                  shiki.name, shiki.type.name, index + 1),
+              image: Image.memory(base64Decode(skill.image)),
             ),
-            // if (skill.bonus != null)
-            //   _buildSkillItem(
-            //     skill: skill.bonus!,
-            //     image: ImageAssets.getBonusSkillByNameTypeAndNumber(
-            //         shiki.name, shiki.type.name, index + 1),
-            //   )
+            if (skill.bonusId != null)
+              _buildSkillItem(
+                skill: shiki.skills
+                    .firstWhere((element) => element.id == skill.bonusId),
+                image: Image.memory(base64Decode(shiki.skills
+                    .firstWhere((element) => element.id == skill.bonusId)
+                    .image)),
+              )
           ],
         ),
       ),
