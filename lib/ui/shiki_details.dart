@@ -99,7 +99,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
               backgroundColor: Colors.black,
               title: Text(
                 _shiki.name.upperCaseFirst,
-                style: StyleApp.s36(),
+                style: StyleApp.s28(),
               ),
             ),
             body: Column(
@@ -316,7 +316,7 @@ class _SkillBottomSheet extends StatelessWidget {
       children: [
         Text(
           skill.name,
-          style: StyleApp.s36(true),
+          style: StyleApp.s28(true),
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 12.h),

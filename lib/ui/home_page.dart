@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       top: MediaQuery.of(context).viewPadding.top + 12.h),
                   child: Text(
                     "Thức thần lục",
-                    style: StyleApp.s36(),
+                    style: StyleApp.s28(),
                   ),
                 ),
                 Padding(
