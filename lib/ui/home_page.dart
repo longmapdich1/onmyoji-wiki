@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _controller;
   final supabase = Supabase.instance.client;
   late List<Shiki> _shiki;
-  late Map<int, String> _listTemp;
 
   @override
   void initState() {
@@ -40,28 +39,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<List<Shiki>> _fetchData() async {
     List<Shiki> result = [];
     final dataShiki = await supabase.from('Shiki').select<PostgrestList>('''
-      id,name,type,image,
-      Stat(*) 
+      id,name,type,image
 ''');
-
-    for (int i = 0; i < dataShiki.length; i++) {
-      final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
-          id,name,describe,cost,bonus,cooldown,type,image,
-          LinkSkillAndNote(
-            SkillNote(name, describe)
-          ),
-          SkillLevelUp(
-            content
-          )
-''').eq("shiki", "${dataShiki[i]["id"]}").order("id", ascending: true);
-      // print(dataSkill[1]);
-      List<Skill> tempList = [];
-      for (var element in dataSkill) {
-        tempList.add(Skill.fromJson(element));
-      }
-      Shiki tempShiki = Shiki.fromJson(dataShiki[i], tempList);
-      result.add(tempShiki);
+    for (var element in dataShiki) {
+      result.add(
+        Shiki(
+          id: element['id'],
+          name: element['name'],
+          image: element['image'],
+          type:
+              ShikiType.values.firstWhere((e) => e.fromJson == element['type']),
+        ),
+      );
     }
+//     for (int i = 0; i < dataShiki.length; i++) {
+//       final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
+//           id,name,describe,cost,bonus,cooldown,type,image,
+//           LinkSkillAndNote(
+//             SkillNote(name, describe)
+//           ),
+//           SkillLevelUp(
+//             content
+//           )
+// ''').eq("shiki", "${dataShiki[i]["id"]}").order("id", ascending: true);
+//       // print(dataSkill[1]);
+//       List<Skill> tempList = [];
+//       for (var element in dataSkill) {
+//         tempList.add(Skill.fromJson(element));
+//       }
+//       Shiki tempShiki = Shiki.fromJson(dataShiki[i], tempList);
+//       result.add(tempShiki);
+//     }
     return result;
   }
 
@@ -144,7 +152,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           onTap: () {
             navigateTo(
               context,
-              ShikiDetails(shiki: shiki),
+              ShikiDetails(shikiId: shiki.id),
             );
           },
           child: Container(

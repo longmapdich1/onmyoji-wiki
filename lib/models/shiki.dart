@@ -49,17 +49,17 @@ class Stat {
 class Shiki {
   final int id;
   final String name;
-  final List<Skill> skills;
-  final Stat stat;
+  final List<Skill>? skills;
+  final Stat? stat;
   final ShikiType type;
   final String? image;
 
   Shiki({
     required this.id,
     required this.name,
-    required this.skills,
-    required this.stat,
     required this.type,
+    this.skills,
+    this.stat,
     this.image,
   });
 

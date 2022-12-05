@@ -11,10 +11,11 @@ import 'package:onmyoji_wiki/common/widgets/common_bottom_sheet.dart';
 import 'package:onmyoji_wiki/common/widgets/list_info_item.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
 import 'package:onmyoji_wiki/models/skill.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ShikiDetails extends StatefulWidget {
-  const ShikiDetails({super.key, required this.shiki});
-  final Shiki shiki;
+  const ShikiDetails({super.key, required this.shikiId});
+  final int shikiId;
 
   @override
   State<ShikiDetails> createState() => _ShikiDetailsState();
@@ -24,7 +25,10 @@ class _ShikiDetailsState extends State<ShikiDetails>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _animationController;
+  final supabase = Supabase.instance.client;
   late Animation _animation;
+  late Shiki _shiki;
+
   @override
   void initState() {
     super.initState();
@@ -44,71 +48,105 @@ class _ShikiDetailsState extends State<ShikiDetails>
     super.dispose();
   }
 
+  Future<Shiki> _fetchData() async {
+    final dataShiki = await supabase.from('Shiki').select<PostgrestList>('''
+      id,name,type,image,
+      Stat(*) 
+''').eq("id", widget.shikiId);
+
+    final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
+          id,name,describe,cost,bonus,cooldown,type,image,
+          LinkSkillAndNote(
+            SkillNote(name, describe)
+          ),
+          SkillLevelUp(
+            content
+          )
+''').eq("shiki", "${dataShiki[0]["id"]}").order("id", ascending: true);
+    // print(dataSkill[1]);
+    List<Skill> tempList = [];
+    for (var element in dataSkill) {
+      tempList.add(Skill.fromJson(element));
+    }
+    return Shiki.fromJson(dataShiki[0], tempList);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white.withOpacity(0.95),
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.black,
-        title: Text(
-          widget.shiki.name.upperCaseFirst,
-          style: StyleApp.s36(),
-        ),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildAvatarContainer(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Container(
-              height: 40.h,
-              padding: EdgeInsets.all(2.sp),
-              decoration: BoxDecoration(
-                color: const Color(0xffF3F6FF),
-                borderRadius: BorderRadius.circular(20),
+    return FutureBuilder<Shiki>(
+        future: _fetchData(),
+        builder: (context, snapshot) {
+          final state = snapshot.data;
+          if (state == null) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          _shiki = snapshot.data!;
+          return Scaffold(
+            backgroundColor: Colors.white.withOpacity(0.95),
+            appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                ),
               ),
-              child: TabBar(
-                indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(56),
-                    color: Colors.white),
-                labelStyle: StyleApp.s16(true),
-                labelColor: Colors.blue,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(child: Text("Chỉ số", style: StyleApp.s16(true))),
-                  Tab(
-                    child: Text("Truyện ký", style: StyleApp.s16(true)),
+              elevation: 0,
+              backgroundColor: Colors.black,
+              title: Text(
+                _shiki.name.upperCaseFirst,
+                style: StyleApp.s36(),
+              ),
+            ),
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildAvatarContainer(),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Container(
+                    height: 40.h,
+                    padding: EdgeInsets.all(2.sp),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF3F6FF),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TabBar(
+                      indicator: BoxDecoration(
+                          borderRadius: BorderRadius.circular(56),
+                          color: Colors.white),
+                      labelStyle: StyleApp.s16(true),
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.black,
+                      tabs: [
+                        Tab(child: Text("Chỉ số", style: StyleApp.s16(true))),
+                        Tab(
+                          child: Text("Truyện ký", style: StyleApp.s16(true)),
+                        ),
+                      ],
+                      controller: _tabController,
+                    ),
                   ),
-                ],
-                controller: _tabController,
-              ),
+                ),
+                SizedBox(height: 4.h),
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildStatTab(),
+                        _buildStoriesTab(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          SizedBox(height: 4.h),
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildStatTab(),
-                  _buildStoriesTab(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Widget _buildAvatarContainer() {
@@ -136,7 +174,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
                   ...List.generate(
                     3,
                     (index) => _buildCircleContainer(
-                        skill: widget.shiki.skills[index],
+                        skill: _shiki.skills![index],
                         index: index,
                         left: index == 0
                             ? MediaQuery.of(context).size.width / 1.5
@@ -173,7 +211,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
                 image: DecorationImage(
                     image: AssetImage(
                       ImageAssets.getAvatarPathByNameAndType(
-                          widget.shiki.name, widget.shiki.type.name),
+                          _shiki.name, _shiki.type.name),
                     ),
                     fit: BoxFit.cover),
               ),
@@ -197,8 +235,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: () {
-          showNativeSheet(
-              context, _SkillBottomSheet(skill, index, widget.shiki));
+          showNativeSheet(context, _SkillBottomSheet(skill, index, _shiki));
         },
         child: RotatedBox(
             quarterTurns: 2, child: Image.memory(base64Decode(skill.image))),
@@ -219,27 +256,25 @@ class _ShikiDetailsState extends State<ShikiDetails>
           ListInfo(list: [
             ListInfoItem(
                 title: "ATK (Tấn công): ",
-                content: widget.shiki.stat.attack.toString()),
+                content: _shiki.stat?.attack.toString()),
             ListInfoItem(
-                title: "HP (Máu): ", content: widget.shiki.stat.hp.toString()),
+                title: "HP (Máu): ", content: _shiki.stat?.hp.toString()),
             ListInfoItem(
-                title: "DEF (Thủ): ",
-                content: widget.shiki.stat.def.toString()),
+                title: "DEF (Thủ): ", content: _shiki.stat?.def.toString()),
             ListInfoItem(
-                title: "SPD (Tốc): ",
-                content: widget.shiki.stat.spd.toString()),
+                title: "SPD (Tốc): ", content: _shiki.stat?.spd.toString()),
             ListInfoItem(
                 title: "CRIT (Tỉ lệ chí mạng): ",
-                content: "${widget.shiki.stat.crit.toInt()}%"),
+                content: "${_shiki.stat?.crit.toInt()}%"),
             ListInfoItem(
                 title: "CRIT DMG (Sát thương chí mạng): ",
-                content: "${widget.shiki.stat.critDame.toInt()}%"),
+                content: "${_shiki.stat?.critDame.toInt()}%"),
             ListInfoItem(
                 title: "EFFECT HIT (Tỉ lệ chính xác): ",
-                content: "${widget.shiki.stat.effectHit.toInt()}%"),
+                content: "${_shiki.stat?.effectHit.toInt()}%"),
             ListInfoItem(
                 title: "EFFECT RES (Tỉ lệ kháng): ",
-                content: "${widget.shiki.stat.effectRes.toInt()}%"),
+                content: "${_shiki.stat?.effectRes.toInt()}%"),
           ]),
         ],
       ),
@@ -345,9 +380,9 @@ class _SkillBottomSheet extends StatelessWidget {
             ),
             if (skill.bonusId != null)
               _buildSkillItem(
-                skill: shiki.skills
+                skill: shiki.skills!
                     .firstWhere((element) => element.id == skill.bonusId),
-                image: Image.memory(base64Decode(shiki.skills
+                image: Image.memory(base64Decode(shiki.skills!
                     .firstWhere((element) => element.id == skill.bonusId)
                     .image)),
               )
