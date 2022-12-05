@@ -8,8 +8,8 @@ import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/list_stagger.dart';
 import 'package:onmyoji_wiki/common/widgets/search_bar.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
-import 'package:onmyoji_wiki/models/skill.dart';
 import 'package:onmyoji_wiki/ui/shiki_details.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,7 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _controller;
   final supabase = Supabase.instance.client;
-  late List<Shiki> _shiki;
+  List<Shiki> _shiki = [];
 
   @override
   void initState() {
@@ -52,24 +52,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     }
-//     for (int i = 0; i < dataShiki.length; i++) {
-//       final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
-//           id,name,describe,cost,bonus,cooldown,type,image,
-//           LinkSkillAndNote(
-//             SkillNote(name, describe)
-//           ),
-//           SkillLevelUp(
-//             content
-//           )
-// ''').eq("shiki", "${dataShiki[i]["id"]}").order("id", ascending: true);
-//       // print(dataSkill[1]);
-//       List<Skill> tempList = [];
-//       for (var element in dataSkill) {
-//         tempList.add(Skill.fromJson(element));
-//       }
-//       Shiki tempShiki = Shiki.fromJson(dataShiki[i], tempList);
-//       result.add(tempShiki);
-//     }
     return result;
   }
 
@@ -85,12 +67,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           future: _fetchData(),
           builder: (context, snapshot) {
             final state = snapshot.data;
-            if (state == null) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+            if (state != null) {
+              _shiki = snapshot.data!;
             }
-            _shiki = snapshot.data!;
+
             return Column(
               children: [
                 Padding(
@@ -118,6 +98,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     Tab(child: ImageAssets.pngAssets(ImageAssets.icN)),
                   ],
                 ),
+                SizedBox(height: 4.h),
                 Expanded(
                   child: TabBarView(controller: _controller, children: [
                     _buildTabView(ShikiType.sp),
@@ -134,11 +115,58 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildTabView(ShikiType type) {
-    List<Shiki> tempList =
-        _shiki.where((element) => element.type == type).toList();
-    return ListStagger<Shiki>(
-      list: tempList,
-      itemWidget: _buildShikiItem,
+    List<Shiki> tempList = [];
+    if (_shiki.isNotEmpty) {
+      tempList = _shiki.where((element) => element.type == type).toList();
+    }
+
+    return _shiki.isNotEmpty
+        ? ListStagger<Shiki>(
+            list: tempList,
+            itemWidget: _buildShikiItem,
+          )
+        : _buildShimmerItem();
+  }
+
+  Widget _buildShimmerItem() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(
+              10,
+              (_) => Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(0.2)),
+                      child: Row(
+                        children: [
+                          ClipOval(
+                            child: Container(
+                              color: Colors.white.withOpacity(0.3),
+                              height: 64.sp,
+                              width: 64.sp,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Container(
+                              height: 12.0,
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
+        ),
+      ),
     );
   }
 

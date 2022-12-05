@@ -9,6 +9,7 @@ import 'package:onmyoji_wiki/common/theme/style_app.dart';
 import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/common_bottom_sheet.dart';
 import 'package:onmyoji_wiki/common/widgets/list_info_item.dart';
+import 'package:onmyoji_wiki/common/widgets/loading_screen.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
 import 'package:onmyoji_wiki/models/skill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -79,7 +80,7 @@ class _ShikiDetailsState extends State<ShikiDetails>
           final state = snapshot.data;
           if (state == null) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: LoadingScreen(),
             );
           }
           _shiki = snapshot.data!;
@@ -252,7 +253,6 @@ class _ShikiDetailsState extends State<ShikiDetails>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          const Icon(Icons.arrow_forward),
           ListInfo(list: [
             ListInfoItem(
                 title: "ATK (Tấn công): ",
@@ -325,8 +325,9 @@ class _SkillBottomSheet extends StatelessWidget {
           "Loại: ${skill.type.toVietNamString}",
           style: StyleApp.s16(true),
         ),
-        // Text(skill.describe, style: StyleApp.s14()),
-        skill.describe.textWithBold,
+        Align(
+            alignment: Alignment.centerLeft,
+            child: skill.describe.textWithBold),
         SizedBox(height: 8.h),
         ...List.generate(
           skill.levelUp.length,
