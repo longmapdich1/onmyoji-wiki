@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     }
+    _shiki = result;
     return result;
   }
 
@@ -90,6 +91,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 TabBar(
                   indicatorPadding: EdgeInsets.symmetric(horizontal: 16.w),
                   controller: _controller,
+                  onTap: ((value) async {
+                    if (_controller.index == value &&
+                        !_controller.indexIsChanging) {
+                      setState(() {});
+                    }
+                  }),
                   tabs: [
                     Tab(child: ImageAssets.pngAssets(ImageAssets.icSP)),
                     Tab(child: ImageAssets.pngAssets(ImageAssets.icSSR)),
@@ -120,12 +127,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       tempList = _shiki.where((element) => element.type == type).toList();
     }
 
-    return _shiki.isNotEmpty
-        ? ListStagger<Shiki>(
-            list: tempList,
-            itemWidget: _buildShikiItem,
-          )
-        : _buildShimmerItem();
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: _shiki.isNotEmpty
+          ? ListStagger<Shiki>(
+              list: tempList,
+              itemWidget: _buildShikiItem,
+            )
+          : _buildShimmerItem(),
+    );
   }
 
   Widget _buildShimmerItem() {
