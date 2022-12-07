@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ListStagger<T> extends StatefulWidget {
-  const ListStagger( {super.key, required this.itemWidget, required this.list});
+  const ListStagger({super.key, required this.itemWidget, required this.list});
   final List<T> list;
   final Widget Function(T) itemWidget;
 
@@ -60,24 +60,23 @@ class _ListStaggerState<T> extends State<ListStagger<T>>
     for (var i = 0; i < widget.list.length; ++i) {
       listItems.add(
         AnimatedBuilder(
-          animation: _staggeredController,
-          builder: (context, child) {
-            final animationPercent = Curves.easeOut.transform(
-              _itemSlideIntervals[i].transform(_staggeredController.value),
-            );
-            final opacity = animationPercent;
-            final slideDistance = (1.0 - animationPercent) * 150;
+            animation: _staggeredController,
+            builder: (context, child) {
+              final animationPercent = Curves.easeOut.transform(
+                _itemSlideIntervals[i].transform(_staggeredController.value),
+              );
+              final opacity = animationPercent;
+              final slideDistance = (1.0 - animationPercent) * 150;
 
-            return Opacity(
-              opacity: opacity,
-              child: Transform.translate(
-                offset: Offset(slideDistance, 0),
-                child: child,
-              ),
-            );
-          },
-          child: widget.itemWidget(widget.list[i])
-        ),
+              return Opacity(
+                opacity: opacity,
+                child: Transform.translate(
+                  offset: Offset(slideDistance, 0),
+                  child: child,
+                ),
+              );
+            },
+            child: widget.itemWidget(widget.list[i])),
       );
     }
     return listItems;

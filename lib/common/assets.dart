@@ -18,36 +18,6 @@ class ImageAssets {
   static const imageWallpaper = "$path/$pathImages/wallpaper.jpg";
   static const imageWallpaper2 = "$path/$pathImages/wallpaper2.png";
 
-  static Image getAvatarByNameAndType(String name, String type) {
-    return pngAssets(
-        "$path/${type.toUpperCase()}/${name.toLowerCase()}/avatar.png",
-        fit: BoxFit.cover);
-  }
-
-  static String getAvatarPathByNameAndType(String name, String type) {
-    return "$path/${type.toUpperCase()}/${name.toLowerCase()}/avatar.png";
-  }
-
-  static Image getFullImageByNameAndType(String name, String type) {
-    return pngAssets(
-        "$path/${type.toUpperCase()}/${name.toLowerCase()}/full.png",
-        fit: BoxFit.cover);
-  }
-
-  static Image getSkillByNameTypeAndNumber(
-      String name, String type, int number) {
-    return pngAssets(
-        "$path/${type.toUpperCase()}/${name.toLowerCase()}/skill$number.png",
-        fit: BoxFit.cover);
-  }
-
-  static Image getBonusSkillByNameTypeAndNumber(
-      String name, String type, int number) {
-    return pngAssets(
-        "$path/${type.toUpperCase()}/${name.toLowerCase()}/skillBonus$number.png",
-        fit: BoxFit.cover);
-  }
-
   static Image pngAssets(
     String name, {
     Color? color,

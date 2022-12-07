@@ -1,19 +1,22 @@
+import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:onmyoji_wiki/common/assets.dart';
 import 'package:onmyoji_wiki/common/navigator.dart';
 import 'package:onmyoji_wiki/common/theme/style_app.dart';
 import 'package:onmyoji_wiki/common/utils.dart';
 import 'package:onmyoji_wiki/common/widgets/common_bottom_sheet.dart';
 import 'package:onmyoji_wiki/common/widgets/list_info_item.dart';
+import 'package:onmyoji_wiki/common/widgets/loading_screen.dart';
 import 'package:onmyoji_wiki/models/shiki.dart';
 import 'package:onmyoji_wiki/models/skill.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ShikiDetails extends StatefulWidget {
-  const ShikiDetails({super.key, required this.shiki});
-  final Shiki shiki;
+  const ShikiDetails({super.key, required this.shikiId});
+  final int shikiId;
 
   @override
   State<ShikiDetails> createState() => _ShikiDetailsState();
@@ -23,163 +26,211 @@ class _ShikiDetailsState extends State<ShikiDetails>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _animationController;
+  final supabase = Supabase.instance.client;
   late Animation _animation;
+  late Shiki _shiki;
+  late Uint8List _avatar;
+  late Uint8List _skill1;
+  late Uint8List _skill2;
+  late Uint8List _skill3;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
-    _animation = Tween(begin: 0.0, end: 1.0).animate(_animationController)
-      ..addListener(() {
-        setState(() {});
-      });
-    _animationController.forward();
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_animationController);
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    supabase.dispose();
     super.dispose();
+  }
+
+  Future<Shiki> _fetchData() async {
+    final dataShiki = await supabase.from('Shiki').select<PostgrestList>('''
+      id,name,type,image,
+      Stat(*) 
+''').eq("id", widget.shikiId);
+
+    final dataSkill = await supabase.from('Skill').select<PostgrestList>('''
+          id,name,describe,cost,bonus,cooldown,type,image,
+          LinkSkillAndNote(
+            SkillNote(name, describe)
+          ),
+          SkillLevelUp(
+            content
+          )
+''').eq("shiki", "${dataShiki[0]["id"]}").order("id", ascending: true);
+    // print(dataSkill[1]);
+    List<Skill> tempList = [];
+    for (var element in dataSkill) {
+      tempList.add(Skill.fromJson(element));
+    }
+    final Shiki tempShiki = Shiki.fromJson(dataShiki[0], tempList);
+    _avatar = base64Decode(tempShiki.image!);
+    _skill1 = base64Decode(tempList[0].image);
+    _skill2 = base64Decode(tempList[1].image);
+    _skill3 = base64Decode(tempList[2].image);
+    return tempShiki;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white.withOpacity(0.95),
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.black,
-        title: Text(
-          widget.shiki.name.upperCaseFirst,
-          style: StyleApp.s36(),
-        ),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildAvatarContainer(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Container(
-              height: 40.h,
-              padding: EdgeInsets.all(2.sp),
-              decoration: BoxDecoration(
-                color: const Color(0xffF3F6FF),
-                borderRadius: BorderRadius.circular(20),
+    return FutureBuilder<Shiki>(
+        future: _fetchData(),
+        builder: (context, snapshot) {
+          final state = snapshot.data;
+          if (state == null) {
+            return const Center(
+              child: LoadingScreen(),
+            );
+          }
+          _animationController.forward();
+          _shiki = snapshot.data!;
+          return Scaffold(
+            backgroundColor: Colors.white.withOpacity(0.95),
+            appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                ),
               ),
-              child: TabBar(
-                indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(56),
-                    color: Colors.white),
-                labelStyle: StyleApp.s16(true),
-                labelColor: Colors.blue,
-                unselectedLabelColor: Colors.black,
-                tabs: [
-                  Tab(child: Text("Chỉ số", style: StyleApp.s16(true))),
-                  Tab(
-                    child: Text("Truyện ký", style: StyleApp.s16(true)),
+              elevation: 0,
+              backgroundColor: Colors.black,
+              title: Text(
+                _shiki.name.upperCaseFirst,
+                style: StyleApp.s28(),
+              ),
+            ),
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildAvatarContainer(),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Container(
+                    height: 40.h,
+                    padding: EdgeInsets.all(2.sp),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF3F6FF),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TabBar(
+                      indicator: BoxDecoration(
+                          borderRadius: BorderRadius.circular(56),
+                          color: Colors.white),
+                      labelStyle: StyleApp.s16(true),
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.black,
+                      tabs: [
+                        Tab(child: Text("Chỉ số", style: StyleApp.s16(true))),
+                        Tab(
+                          child: Text("Truyện ký", style: StyleApp.s16(true)),
+                        ),
+                      ],
+                      controller: _tabController,
+                    ),
                   ),
-                ],
-                controller: _tabController,
-              ),
+                ),
+                SizedBox(height: 4.h),
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildStatTab(),
+                        _buildStoriesTab(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          SizedBox(height: 4.h),
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildStatTab(),
-                  _buildStoriesTab(),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Widget _buildAvatarContainer() {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(height: MediaQuery.of(context).size.height / 2.8),
-        Positioned(
-          top: -250.h,
-          child: Transform.rotate(
-            angle: -_animation.value * pi,
-            child: Transform.scale(
-              scale: 1.5,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 375.h,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(height: MediaQuery.of(context).size.height / 2.8),
+          Positioned(
+            top: -250.h,
+            child: Transform.rotate(
+              angle: -_animation.value * pi,
+              child: Transform.scale(
+                scale: 1.5,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 375.h,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  ...List.generate(
-                    widget.shiki.skills.length,
-                    (index) => _buildCircleContainer(
-                        skill: widget.shiki.skills[index],
-                        index: index,
-                        left: index == 0
-                            ? MediaQuery.of(context).size.width / 1.5
-                            : index == 1
-                                ? MediaQuery.of(context).size.width / 2.35
-                                : MediaQuery.of(context).size.width / 5.2,
-                        top: index == 1 ? -20.h : null),
-                  ),
-                ],
+                    ...List.generate(
+                      3,
+                      (index) => _buildCircleContainer(
+                          skill: _shiki.skills![index],
+                          index: index,
+                          left: index == 0
+                              ? MediaQuery.of(context).size.width / 1.5
+                              : index == 1
+                                  ? MediaQuery.of(context).size.width / 2.35
+                                  : MediaQuery.of(context).size.width / 5.2,
+                          top: index == 1 ? -20.h : null),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        ClipPath(
-          clipper: _CustomRoundClipper(70.h),
-          child: Container(
-            height: 150.h,
-            color: Colors.black,
-          ),
-        ),
-        Positioned(
-          child: Align(
-            alignment: Alignment.topCenter,
+          ClipPath(
+            clipper: _CustomRoundClipper(50.h),
             child: Container(
-              margin: EdgeInsets.only(top: 30.h),
-              height: 108.sp,
-              width: 108.sp,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(color: Colors.black, blurRadius: 3.0)
-                ],
-                image: DecorationImage(
-                    image: AssetImage(
-                      ImageAssets.getAvatarPathByNameAndType(
-                          widget.shiki.name, widget.shiki.type.name),
-                    ),
-                    fit: BoxFit.cover),
-              ),
+              height: 140.h,
+              color: Colors.black,
             ),
           ),
-        )
-      ],
+          Positioned(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: 30.h),
+                child: ClipOval(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(color: Colors.black, blurRadius: 3.0)
+                      ],
+                    ),
+                    child: Image.memory(
+                      _avatar,
+                      width: 100.sp,
+                      height: 100.sp,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -196,13 +247,17 @@ class _ShikiDetailsState extends State<ShikiDetails>
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: () {
-          showNativeSheet(
-              context, _SkillBottomSheet(skill, index, widget.shiki));
+          showNativeSheet(context, _SkillBottomSheet(skill, index, _shiki));
         },
         child: RotatedBox(
           quarterTurns: 2,
-          child: ImageAssets.getSkillByNameTypeAndNumber(
-              widget.shiki.name, widget.shiki.type.name, index + 1),
+          child: Image.memory(
+            index == 0
+                ? _skill1
+                : index == 1
+                    ? _skill2
+                    : _skill3,
+          ),
         ),
       ),
     );
@@ -217,31 +272,28 @@ class _ShikiDetailsState extends State<ShikiDetails>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          const Icon(Icons.arrow_forward),
           ListInfo(list: [
             ListInfoItem(
                 title: "ATK (Tấn công): ",
-                content: widget.shiki.stat.attack.toString()),
+                content: _shiki.stat?.attack.toString()),
             ListInfoItem(
-                title: "HP (Máu): ", content: widget.shiki.stat.hp.toString()),
+                title: "HP (Máu): ", content: _shiki.stat?.hp.toString()),
             ListInfoItem(
-                title: "DEF (Thủ): ",
-                content: widget.shiki.stat.def.toString()),
+                title: "DEF (Thủ): ", content: _shiki.stat?.def.toString()),
             ListInfoItem(
-                title: "SPD (Tốc): ",
-                content: widget.shiki.stat.spd.toString()),
+                title: "SPD (Tốc): ", content: _shiki.stat?.spd.toString()),
             ListInfoItem(
                 title: "CRIT (Tỉ lệ chí mạng): ",
-                content: "${widget.shiki.stat.crit.toInt()}%"),
+                content: "${_shiki.stat?.crit.toInt()}%"),
             ListInfoItem(
                 title: "CRIT DMG (Sát thương chí mạng): ",
-                content: "${widget.shiki.stat.critDame.toInt()}%"),
+                content: "${_shiki.stat?.critDame.toInt()}%"),
             ListInfoItem(
                 title: "EFFECT HIT (Tỉ lệ chính xác): ",
-                content: "${widget.shiki.stat.effectHit.toInt()}%"),
+                content: "${_shiki.stat?.effectHit.toInt()}%"),
             ListInfoItem(
                 title: "EFFECT RES (Tỉ lệ kháng): ",
-                content: "${widget.shiki.stat.effectRes.toInt()}%"),
+                content: "${_shiki.stat?.effectRes.toInt()}%"),
           ]),
         ],
       ),
@@ -282,7 +334,7 @@ class _SkillBottomSheet extends StatelessWidget {
       children: [
         Text(
           skill.name,
-          style: StyleApp.s36(true),
+          style: StyleApp.s28(true),
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -292,7 +344,6 @@ class _SkillBottomSheet extends StatelessWidget {
           "Loại: ${skill.type.toVietNamString}",
           style: StyleApp.s16(true),
         ),
-        // Text(skill.describe, style: StyleApp.s14()),
         Align(
             alignment: Alignment.centerLeft,
             child: skill.describe.textWithBold),
@@ -345,14 +396,15 @@ class _SkillBottomSheet extends StatelessWidget {
           children: [
             _buildSkillItem(
               skill: skill,
-              image: ImageAssets.getSkillByNameTypeAndNumber(
-                  shiki.name, shiki.type.name, index + 1),
+              image: Image.memory(base64Decode(skill.image)),
             ),
-            if (skill.bonus != null)
+            if (skill.bonusId != null)
               _buildSkillItem(
-                skill: skill.bonus!,
-                image: ImageAssets.getBonusSkillByNameTypeAndNumber(
-                    shiki.name, shiki.type.name, index + 1),
+                skill: shiki.skills!
+                    .firstWhere((element) => element.id == skill.bonusId),
+                image: Image.memory(base64Decode(shiki.skills!
+                    .firstWhere((element) => element.id == skill.bonusId)
+                    .image)),
               )
           ],
         ),

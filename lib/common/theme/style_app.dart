@@ -56,15 +56,15 @@ class StyleApp {
     );
   }
 
-  static TextStyle s36([bool isBold = false]) {
+  static TextStyle s28([bool isBold = false]) {
     FontWeight weight = FontWeight.w400;
     if (isBold) {
       weight = FontWeight.w500;
     }
     return TextStyle(
-      fontSize: 36.sp,
+      fontSize: 28.sp,
       fontWeight: weight,
-      height: (40 / 36).sp,
+      height: (34 / 28).sp,
     );
   }
 }
