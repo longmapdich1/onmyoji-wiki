@@ -39,11 +39,3 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/SP/kiyohime/
-    - assets/SP/enma/
-    - assets/SP/momiji/
-    - assets/SP/orochi/
-    - assets/SSR/jinkougyou/
-    - assets/SR/kairaishi/
-    - assets/R/kappa/
-    - assets/N/parasite/
